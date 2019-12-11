@@ -42,7 +42,7 @@ fi
 printf "\n"
 printf "ingrese contasena para el usuario root en la base de datos.\n"
 printf "Minimo 6 caracteres\n"
-printf "[mysql pass]: "
+printf "[mysql root pass]: "
 read KEYPASS
 if [ -z "$KEYPASS" ]
 then
@@ -53,14 +53,13 @@ fi
 printf "\n"
 printf "ingrese contasena para el usuario de asterisk en la base de datos.\n"
 printf "Minimo 6 caracteres\n"
-printf "[mysql pass]: "
+printf "[mysql asterisk pass]: "
 read KEYPASS_ASTERISK
 if [ -z "$KEYPASS_ASTERISK" ]
 then
     echo "No valido"
     exit 1
 fi
-
 
 # instalacion dependencias primarias
 yum -y install wget ca-certificates nano net-tools yum-utils
@@ -120,7 +119,7 @@ mysql -uroot -e "use mysql;
                   FLUSH PRIVILEGES;"
 
 mysql -uroot -p"$KEYPASS" -e "CREATE DATABASE asterisk;
-                              GRANT ALL PRIVILEGES ON asterisk.* TO 'asterisk'@'localhost' IDENTIFIED BY "$KEYPASS_ASTERISK"; 
+                              GRANT ALL PRIVILEGES ON asterisk.* TO 'asterisk'@'localhost' IDENTIFIED BY '$KEYPASS_ASTERISK'; 
                               FLUSH PRIVILEGES;"
 
 mysql -uroot -p"$KEYPASS" -e "CREATE TABLE asterisk.ast_cdr (
@@ -149,9 +148,15 @@ sed -i "s/^localnet=local_ip/localnet=$IP_MACHINE/g" sip.conf
 sed -i "s/asterisk_db_password/$KEYPASS_ASTERISK/g" res_mysql.conf
 sed -i "s/asterisk_db_password/$KEYPASS_ASTERISK/g" cdr_mysql.conf
 
+# reinicio de servicios
+systemctl stop httpd
+systemctl start httpd
+systemctl status httpd
 
+systemctl stop mysql
+systemctl start mysql
+systemctl status mysql
 
+systemctl stop asterisk
 systemctl start asterisk
 systemctl status asterisk
-
-
