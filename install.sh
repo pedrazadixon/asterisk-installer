@@ -1,3 +1,12 @@
+#!/bin/bash
+
+# variables
+
+DIR_SCRITP="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+ROOTUSER=root
+KEYPASS=123456
+
 # instalacion dependencias primarias
 yum -y install wget ca-certificates nano net-tools yum-utils
  
@@ -18,7 +27,6 @@ make menuselect.makeopts
 make
 ./contrib/scripts/get_mp3_source.sh
 make install
-# make samples
 make config
 service asterisk start
 service asterisk status
@@ -30,7 +38,10 @@ setenforce 0 && sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
 # desactivar firewalld (si es necesario)
 systemctl stop firewalld
 systemctl disable firewalld
- 
+
+ROOTUSER=root
+KEYPASS=123456
+
 # instalacion web server
 yum -y install httpd
 systemctl enable httpd
@@ -44,9 +55,12 @@ yum -y install http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
 yum -y install mysql-community-server
 systemctl start mysqld
 systemctl enable mysqld
-mysql -u root
-    use mysql;
-    UPDATE user SET password=PASSWORD("123456") WHERE user='root';
-    FLUSH PRIVILEGES;
-    QUIT;
+
+mysql -u root -e "use mysql; 
+                  UPDATE user SET password=PASSWORD('$KEYPASS') WHERE user='$ROOTUSER'; 
+                  FLUSH PRIVILEGES;"
+
+cd $DIR_SCRITP
+
+cp confs/* /etc/asterisk/
 
