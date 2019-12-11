@@ -90,7 +90,7 @@ mkdir -p /etc/asterisk/keys
 
 # configuraciones estandar asterisk
 cd $DIR_SCRITP
-cp confs/* /etc/asterisk/
+cp etc/asterisk/* /etc/asterisk/
 
 # error: Unable to connect to remote asterisk (does /var/run/asterisk/asterisk.ctl exist?)
 # si obtienes este error se debe deshabilitar selinux usando la siguiente linea: 
@@ -103,6 +103,14 @@ systemctl disable firewalld
 # instalacion web server
 yum -y install httpd
 systemctl enable httpd
+
+#configuracion virtualhost 
+mkdir /etc/httpd/sites-available
+mkdir /etc/httpd/sites-enabled
+printf "\nIncludeOptional sites-enabled/*.conf" >> /etc/httpd/conf/httpd.conf
+cp etc/httpd/sites-available/* /etc/httpd/sites-available/
+ln -s /etc/httpd/sites-available/000-default.conf /etc/httpd/sites-enabled/000-default.conf
+
 systemctl start httpd
  
 #instalacion php y modulos especificos
