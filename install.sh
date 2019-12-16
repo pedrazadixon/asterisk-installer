@@ -101,7 +101,7 @@ systemctl stop firewalld
 systemctl disable firewalld
 
 # instalacion web server
-yum -y install httpd
+yum -y install httpd mod_ssl
 systemctl enable httpd
 
 #configuracion virtualhost 
