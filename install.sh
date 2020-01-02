@@ -122,6 +122,8 @@ yum -y install mysql-community-server
 systemctl start mysqld
 systemctl enable mysqld
 
+yum -y install lame
+
 mysql -uroot -e "use mysql; 
                   UPDATE user SET password=PASSWORD('$KEYPASS') WHERE user='$ROOTUSER'; 
                   FLUSH PRIVILEGES;"
